@@ -1,0 +1,7 @@
+{
+  "JiraLogin":"userName",
+  "JiraPassword":"userPassword",
+  "TestRailURL":"http://example.com",
+  "TestRailLogin":"userName",
+  "TestRailPassword":"userPassword"
+}
