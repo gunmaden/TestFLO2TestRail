@@ -5,6 +5,7 @@
   "TestRailURL":"http://example.com",
   "TestRailLogin":"userName",
   "TestRailPassword":"userPassword",
-  "TestRailProjectName":"ProjectName" // Project name as shown in list of projects
+  "TestRailProjectName":"ProjectName", // Project name as shown in list of projects
+  "TestRailsSuiteName":"SuiteName", // Suite name in TestRail
   "CaseTypes": "CaseTypeFromTestRail" // Case types from Test rails [Test Case (Steps), Test Case (Text)]
 }

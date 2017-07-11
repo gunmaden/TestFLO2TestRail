@@ -5,14 +5,14 @@ from migrator import *
 
 
 def auth():
-    with open("settings.json", 'r') as file:
-        login = jp.decode(file)['JiraLogin']
-        password = jp.decode(file)['JiraPassword']
-        credentials = {
-            "os_username": login,
-            "os_password": password
-        }
-        return credentials
+
+    login = conf.JiraLogin
+    password = conf.JiraPassword
+    credentials = {
+        "os_username": login,
+        "os_password": password
+    }
+    return credentials
 
 
 def retTemplateT():
@@ -36,6 +36,7 @@ def retCaseT():
         'Steps': ""
     }
 
+
 ###################################################################################################################
 
 req = requests.post("https://jira.parcsis.org/rest/gadget/1.0/login", data=auth())
@@ -52,8 +53,7 @@ while cookies is None:
 
 issuesReq = {
     'startIndex': 0,
-    'jql': 'project = {} and type = "Test Case Template" and status = Active'.format(
-        input("Enter project name ( CASEM / CSP / CL / CB): "))
+    'jql': 'project = {} and type = "Test Case Template" and status = Active'.format(conf.JiraProjectName)
 }
 
 headers = {'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -88,9 +88,13 @@ for templateId in templatesIds:
     cTemplate['TemplateName'] = templateCategory
     groupNames = Tree(fields).execute("$..groupName")
     groups = set(list(groupNames))
-    if len(groups) == 0:
-        print("Warning: all steps in template without groups will be grouped by same name as template")
-        groups.add(templateCategory)
+
+    # TODO research this fragment
+    # if len(groups) == 0:
+    #     print("Warning: all steps in template without groups will be grouped by same name as template")
+    #     groups.add(templateCategory)
+
+    #############
     print("Start migrating template: {}".format(templateCategory))
     for gr in groups:
         cGroup = retGroupsT()

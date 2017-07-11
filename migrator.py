@@ -1,6 +1,43 @@
 import jsonpickle as jp
-
+from objectpath import *
 from testrail import *
+
+
+################## RETURN TEMPLATES ###################
+
+def retProjL(prL):
+    return {
+        'Projects': prL
+    }
+
+
+def retSuitesL(sL):
+    return {
+        'Suites': sL
+    }
+
+
+def retSectionBodyT():
+    return {
+        'name': "",
+        'suite_id': ""
+    }
+
+
+def retSubsectionBodyT():
+    return {
+        'name': "",
+        'suite_id': "",
+        'parent_id': ""
+    }
+
+
+#######################################################
+
+
+################## MAIN FUNCTIONS #####################
+
+
 
 
 class testCase:
@@ -17,15 +54,38 @@ class testCase:
         return client.send_post('add_case/{}'.format(sectionId), data=case)
 
 
+def readConfig():
+    with open("settings.json", 'r') as f:
+        file = f.read()
+        return jp.decode(file)
+
+
+class Config():
+
+    def __init__(self):
+        self.JiraLogin = readConfig()["JiraLogin"],
+        self.JiraPassword = readConfig()["JiraPassword"],
+        self.JiraProjectName = readConfig()["JiraProjectName"]
+        self.TestRailURL = readConfig()["TestRailURL"]
+        self.TestRailLogin = readConfig()["TestRailLogin"]
+        self.TestRailPassword = readConfig()["TestRailPassword"]
+        self.TestRailProjectName = readConfig()["TestRailProjectName"]
+        self.TestRailsSuiteName = readConfig()["TestRailsSuiteName"]
+        self.CaseTypes = readConfig()["CaseTypes"]
+
+    def __repr__(self):
+        jp.decode(jp.encode(self, unpicklable=False))
+
+conf = Config()
+
 def auth():
-     with open("settings.json", 'r') as file:
-        URL = jp.decode(file)['TestRailURL']
-        login = jp.decode(file)['TestRailLogin']
-        password = jp.decode(file)['TestRailPassword']
-        client = APIClient(URL)
-        client.user = login
-        client.password = password
-        return client
+    URL = conf.TestRailURL
+    login = conf.TestRailLogin
+    password = conf.TestRailPassword
+    client = APIClient(URL)
+    client.user = login
+    client.password = password
+    return client
 
 
 def addSection(client, section, projectId):
@@ -36,27 +96,22 @@ def getSections(client, projectId, suiteId):
     return client.send_get('get_sections/{}&suite_id={}'.format(projectId, suiteId))
 
 
-def getProjectId(client):
-    return client.send_get('get_projects')[0]['id']
+def getProjects(client):
+    return client.send_get('get_projects')
 
 
-def getSuiteId(client, projectId):
-    return client.send_get('get_suites/{}'.format(projectId))[0]['id']
+def getProjectId(client, projectName):
+    return Tree(retProjL(getProjects(client))) \
+        .execute("$..Projects..*[@.name is '{}'][0]".format(projectName))['id']
 
 
-def retSectionBodyT():
-    return {
-        'name': "",
-        'suite_id': ""
-    }
+def getSuites(client, projectId):
+    return client.send_get('get_suites/{}'.format(projectId))
 
 
-def retSubsectionBodyT():
-    return {
-        'name': "",
-        'suite_id': "",
-        'parent_id': ""
-    }
+def getSuiteId(client, projectId, suiteName):
+    return Tree(retSuitesL(getSuites(client, projectId))) \
+        .execute("$..Suites..*[@.name is '{}'][0]".format(suiteName))['id']
 
 
 def migrateTemplate(template):
