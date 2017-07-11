@@ -5,8 +5,6 @@ from migrator import *
 
 
 def auth():
-    # login = ""
-    # password = ""
     with open("settings.json", 'r') as file:
         login = jp.decode(file)['JiraLogin']
         password = jp.decode(file)['JiraPassword']
@@ -37,7 +35,6 @@ def retCaseT():
         'ExpectedResult': "",
         'Steps': ""
     }
-
 
 ###################################################################################################################
 

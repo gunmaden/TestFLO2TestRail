@@ -1,7 +1,10 @@
 {
   "JiraLogin":"userName",
   "JiraPassword":"userPassword",
+  "JiraProjectName":"PRNAME" // Prject name in JIRA (prefix before issue)
   "TestRailURL":"http://example.com",
   "TestRailLogin":"userName",
-  "TestRailPassword":"userPassword"
+  "TestRailPassword":"userPassword",
+  "TestRailProjectName":"ProjectName" // Project name as shown in list of projects
+  "CaseTypes": "CaseTypeFromTestRail" // Case types from Test rails [Test Case (Steps), Test Case (Text)]
 }
