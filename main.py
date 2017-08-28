@@ -115,9 +115,17 @@ for templateId in templatesIds:
 
         for i in range(0, len(stepsL)):
             case = retCaseT()
-            case['Name'] = "Case #{}".format(i + 1)
+            if "h2." in stepsL[i]:
+                name = str(stepsL[i]).split("\r\n")[0]
+                stepsList = stepsL[i].split("\r\n")
+                stepsList.pop(0)
+                stepsI = "\r\n".join(stepsList)
+                case['Steps'] = stepsI
+                case['Name'] = name.replace("h2. ", "")
+            else:
+                case['Name'] = "Case #{}".format(i + 1)
+                case['Steps'] = stepsL[i]
             case['ExpectedResult'] = expResL[i]
-            case['Steps'] = stepsL[i]
             cGroup['Cases'].append(case)
 
         cTemplate['CaseGroups'].append(cGroup)

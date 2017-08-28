@@ -1,13 +1,13 @@
-from migrator import getSuiteId, getProjectId, getSections
+from migrator import getSuiteId, getProjectId, getSections, Config
 from testrail import *
 import jsonpickle as jp
 
-
+conf = Config()
 def auth():
     with open("settings.json", 'r') as file:
-        URL = jp.decode(file)['TestRailURL']
-        login = jp.decode(file)['TestRailLogin']
-        password = jp.decode(file)['TestRailPassword']
+        URL = conf.TestRailURL
+        login = conf.TestRailLogin
+        password = conf.TestRailPassword
         client = APIClient(URL)
         client.user = login
         client.password = password
@@ -16,8 +16,8 @@ def auth():
 
 client = auth()
 
-projectId = getProjectId(client)
-suiteId = getSuiteId(client, projectId)
+projectId = getProjectId(client, conf.TestRailProjectName)
+suiteId = getSuiteId(client, projectId, conf.TestRailsSuiteName)
 
 counter = 0
 for section in getSections(client, projectId, suiteId):

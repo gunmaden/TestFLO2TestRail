@@ -1,4 +1,5 @@
 import jsonpickle as jp
+import time
 from objectpath import *
 from testrail import *
 
@@ -51,8 +52,14 @@ class testCase:
 
     def create(self, client, sectionId):
         case = jp.decode(jp.encode(self, unpicklable=False))
-        return client.send_post('add_case/{}'.format(sectionId), data=case)
-
+        while True:
+            try:
+                resp = client.send_post('add_case/{}'.format(sectionId), data=case)
+            except APIError:
+                time.sleep(3)
+                continue
+            break
+        return resp
 
 def readConfig():
     with open("settings.json", 'r') as f:
@@ -89,7 +96,14 @@ def auth():
 
 
 def addSection(client, section, projectId):
-    return client.send_post('add_section/{}'.format(projectId), data=section)
+    while True:
+        try:
+            resp = client.send_post('add_section/{}'.format(projectId), data=section)
+        except APIError:
+            time.sleep(3)
+            continue
+        break
+    return resp
 
 
 def getSections(client, projectId, suiteId):
@@ -117,8 +131,8 @@ def getSuiteId(client, projectId, suiteName):
 def migrateTemplate(template):
     client = auth()
 
-    projectId = getProjectId(client)
-    suiteId = getSuiteId(client, projectId)
+    projectId = getProjectId(client, conf.TestRailProjectName)
+    suiteId = getSuiteId(client, projectId, conf.TestRailsSuiteName)
     groupList = template['CaseGroups']
 
     sectionBody = retSectionBodyT()
@@ -140,7 +154,7 @@ def migrateTemplate(template):
         for case in group['Cases']:
             counter += 1
             testCase(
-                "Case #{}".format(counter),
+                case['Name'],
                 case['Steps'],
                 case['ExpectedResult']).create(
                 client,
